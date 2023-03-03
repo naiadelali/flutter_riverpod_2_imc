@@ -3,17 +3,16 @@ import 'package:flutter_riverpod_exemple/imc_model.dart';
 
 import 'imc_provider.dart';
 
-class IMCNotifier extends Notifier<ImcModel> {
+class IMCNotifier extends AutoDisposeNotifier<ImcModel> {
   ImcModel _viewModel = ImcModel();
 
-  get altura => ref.watch(alturaProvider);
 
   updateWeight(String value) {
-    _viewModel = _viewModel.copyWith(weight: double.tryParse(value) ?? 0);
+    _viewModel = _viewModel.copyWith(weight: double.tryParse(value));
   }
 
   updateHeight(String value) {
-    _viewModel = _viewModel.copyWith(height: double.tryParse(value) ?? 0);
+    _viewModel = _viewModel.copyWith(height: double.tryParse(value));
     ref.read(alturaProvider.notifier).state = value;
   }
 
@@ -46,6 +45,12 @@ class IMCNotifier extends Notifier<ImcModel> {
       print("IMCNotifier disposed");
     });
 
-    return ImcModel();
+    return _viewModel;
+  }
+
+  reset() {
+    state =
+        _viewModel.copyWith(infoText: "Informe os dados", weight: 0, height: 0);
+    ref.read(alturaProvider.notifier).state = "";
   }
 }

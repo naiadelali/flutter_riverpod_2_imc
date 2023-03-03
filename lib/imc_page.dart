@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod_exemple/widgets/button_calculate.dart';
 
 import 'imc_provider.dart';
 
@@ -9,12 +10,16 @@ class ImcPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final TextEditingController wtController = TextEditingController();
-    final TextEditingController htController = TextEditingController();
     final notifier = ref.read(imcNotifierProvider.notifier);
     final imc = ref.watch(imcNotifierProvider).infoText;
+    final altura = ref.watch(imcNotifierProvider).height;
+    final peso = ref.watch(imcNotifierProvider).weight;
+    final TextEditingController wtController =
+        TextEditingController(text: peso != null ? peso.toString() : "");
+    final TextEditingController htController =
+        TextEditingController(text: altura != null ? altura.toString() : "");
 
-    final button = ElevatedButton(
+    final button = ButtonCalculate(
       onPressed: () {
         if (wtController.text.isEmpty || htController.text.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -26,19 +31,7 @@ class ImcPage extends ConsumerWidget {
           notifier.calculate();
         }
       },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-      child: const Text(
-        'Calcular',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 25.0,
-        ),
-      ),
+      title: 'Calcular',
     );
 
     return Scaffold(
@@ -49,7 +42,7 @@ class ImcPage extends ConsumerWidget {
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => ref.refresh(imcNotifierProvider),
+            onPressed: () => notifier.reset(),
           )
         ],
       ),
