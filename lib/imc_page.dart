@@ -1,23 +1,124 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod_exemple/widgets/button_calculate.dart';
 
 import 'imc_provider.dart';
+import 'widgets/widgets.dart';
 
-class ImcPage extends ConsumerWidget {
+// class ImcPage extends ConsumerWidget {
+//   const ImcPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final notifier = ref.read(imcNotifierProvider.notifier);
+//     final imc = ref.watch(imcNotifierProvider).infoText;
+//     final altura = ref.watch(imcNotifierProvider).height;
+//     final peso = ref.watch(imcNotifierProvider).weight;
+//     final TextEditingController wtController =
+//         TextEditingController(text: peso != null ? peso.toString() : "");
+//     final TextEditingController htController =
+//         TextEditingController(text: altura != null ? altura.toString() : "");
+
+//     final button = ButtonCalculate(
+//       onPressed: () {
+//         if (wtController.text.isEmpty || htController.text.isEmpty) {
+//           ScaffoldMessenger.of(context).showSnackBar(
+//             const SnackBar(
+//               content: Text('Insira seus dados!'),
+//             ),
+//           );
+//         } else {
+//           notifier.calculate();
+//         }
+//       },
+//       title: 'Calcular',
+//     );
+
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Calculadora de IMC'),
+//         centerTitle: true,
+//         backgroundColor: Colors.purple,
+//         actions: <Widget>[
+//           IconButton(
+//             icon: const Icon(Icons.refresh),
+//             onPressed: () => notifier.reset(),
+//           )
+//         ],
+//       ),
+//       backgroundColor: Colors.white,
+//       body: SingleChildScrollView(
+//         padding: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.stretch,
+//           children: <Widget>[
+//             const Icon(Icons.person_outline, size: 120.0, color: Colors.purple),
+//             TextFormFieldWidget(
+//               htController: wtController,
+//               onChange: (value) => notifier.updateWeight(value),
+//               title: 'Peso',
+//             ),
+//             TextFormFieldWidget(
+//               htController: htController,
+//               onChange: (value) => notifier.updateHeight(value),
+//               title: 'Altura',
+//             ),
+//             Padding(
+//               padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+//               child: SizedBox(
+//                 height: 50.0,
+//                 child: button,
+//               ),
+//             ),
+//             Column(
+//               children: [
+//                 Text(
+//                   imc,
+//                   textAlign: TextAlign.center,
+//                   style: const TextStyle(color: Colors.purple, fontSize: 25.0),
+//                 ),
+//                 const AlturaImcConsumrExemplo(),
+//                 Text(
+//                   'Altura: $altura',
+//                   textAlign: TextAlign.center,
+//                   style: const TextStyle(color: Colors.purple, fontSize: 25.0),
+//                 ),
+//               ],
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+class ImcPage extends ConsumerStatefulWidget {
   const ImcPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final notifier = ref.read(imcNotifierProvider.notifier);
-    final imc = ref.watch(imcNotifierProvider).infoText;
-    final altura = ref.watch(imcNotifierProvider).height;
-    final peso = ref.watch(imcNotifierProvider).weight;
-    final TextEditingController wtController =
-        TextEditingController(text: peso != null ? peso.toString() : "");
-    final TextEditingController htController =
-        TextEditingController(text: altura != null ? altura.toString() : "");
+  ConsumerState<ConsumerStatefulWidget> createState() => _ImcPageState();
+}
+
+class _ImcPageState extends ConsumerState<ImcPage> {
+  late dynamic controller;
+  late String imc;
+  late double? altura;
+  late double? peso;
+  late TextEditingController wtController;
+  late TextEditingController htController;
+
+  @override
+  void initState() {
+    wtController = TextEditingController();
+    htController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    controller = ref.read(imcNotifierProvider.notifier);
+    imc = ref.watch(imcNotifierProvider).infoText;
+    altura = ref.watch(imcNotifierProvider).height;
+    peso = ref.watch(imcNotifierProvider).weight;
 
     final button = ButtonCalculate(
       onPressed: () {
@@ -28,7 +129,7 @@ class ImcPage extends ConsumerWidget {
             ),
           );
         } else {
-          notifier.calculate();
+          controller.calculate();
         }
       },
       title: 'Calcular',
@@ -42,7 +143,11 @@ class ImcPage extends ConsumerWidget {
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => notifier.reset(),
+            onPressed: () {
+              controller.reset();
+              wtController.clear();
+              htController.clear();
+            },
           )
         ],
       ),
@@ -53,45 +158,15 @@ class ImcPage extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             const Icon(Icons.person_outline, size: 120.0, color: Colors.purple),
-            TextFormField(
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'Peso (Kg)',
-                labelStyle: TextStyle(
-                  color: Colors.purple,
-                ),
-              ),
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.purple, fontSize: 25.0),
-              controller: wtController,
-              onChanged: (value) => notifier.updateWeight(value),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Insira seu peso.';
-                }
-                return null;
-              },
+            TextFormFieldWidget(
+              htController: wtController,
+              onChange: (value) => controller.updateWeight(value),
+              title: 'Peso',
             ),
-            TextFormField(
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'Altura',
-                labelStyle: TextStyle(
-                  color: Colors.purple,
-                ),
-              ),
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.purple, fontSize: 25.0),
-              controller: htController,
-              onChanged: (value) => notifier.updateHeight(value),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Insira sua altura.';
-                }
-                return null;
-              },
+            TextFormFieldWidget(
+              htController: htController,
+              onChange: (value) => controller.updateHeight(value),
+              title: 'Altura',
             ),
             Padding(
               padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
@@ -100,27 +175,20 @@ class ImcPage extends ConsumerWidget {
                 child: button,
               ),
             ),
-            Consumer(
-              builder: (BuildContext context, WidgetRef ref, Widget? child) {
-                //uso outro provider para alterar simultaneamente os valores sem afetar o provider do imcNotifier
-                final altura = ref.watch(alturaProvider);
-                return Column(
-                  children: [
-                    Text(
-                      imc,
-                      textAlign: TextAlign.center,
-                      style:
-                          const TextStyle(color: Colors.purple, fontSize: 25.0),
-                    ),
-                    Text(
-                      'Altura: $altura',
-                      textAlign: TextAlign.center,
-                      style:
-                          const TextStyle(color: Colors.purple, fontSize: 25.0),
-                    ),
-                  ],
-                );
-              },
+            Column(
+              children: [
+                Text(
+                  imc,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.purple, fontSize: 25.0),
+                ),
+                const AlturaImcConsumrExemplo(),
+                Text(
+                  'Altura: $altura',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.purple, fontSize: 25.0),
+                ),
+              ],
             ),
           ],
         ),

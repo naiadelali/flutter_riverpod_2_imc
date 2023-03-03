@@ -3,9 +3,8 @@ import 'package:flutter_riverpod_exemple/imc_model.dart';
 
 import 'imc_provider.dart';
 
-class IMCNotifier extends AutoDisposeNotifier<ImcModel> {
+class IMCController extends AutoDisposeNotifier<ImcModel> {
   ImcModel _viewModel = ImcModel();
-
 
   updateWeight(String value) {
     _viewModel = _viewModel.copyWith(weight: double.tryParse(value));
