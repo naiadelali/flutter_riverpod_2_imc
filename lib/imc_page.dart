@@ -4,93 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'imc_provider.dart';
 import 'widgets/widgets.dart';
 
-// class ImcPage extends ConsumerWidget {
-//   const ImcPage({super.key});
-
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final notifier = ref.read(imcNotifierProvider.notifier);
-//     final imc = ref.watch(imcNotifierProvider).infoText;
-//     final altura = ref.watch(imcNotifierProvider).height;
-//     final peso = ref.watch(imcNotifierProvider).weight;
-//     final TextEditingController wtController =
-//         TextEditingController(text: peso != null ? peso.toString() : "");
-//     final TextEditingController htController =
-//         TextEditingController(text: altura != null ? altura.toString() : "");
-
-//     final button = ButtonCalculate(
-//       onPressed: () {
-//         if (wtController.text.isEmpty || htController.text.isEmpty) {
-//           ScaffoldMessenger.of(context).showSnackBar(
-//             const SnackBar(
-//               content: Text('Insira seus dados!'),
-//             ),
-//           );
-//         } else {
-//           notifier.calculate();
-//         }
-//       },
-//       title: 'Calcular',
-//     );
-
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Calculadora de IMC'),
-//         centerTitle: true,
-//         backgroundColor: Colors.purple,
-//         actions: <Widget>[
-//           IconButton(
-//             icon: const Icon(Icons.refresh),
-//             onPressed: () => notifier.reset(),
-//           )
-//         ],
-//       ),
-//       backgroundColor: Colors.white,
-//       body: SingleChildScrollView(
-//         padding: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.stretch,
-//           children: <Widget>[
-//             const Icon(Icons.person_outline, size: 120.0, color: Colors.purple),
-//             TextFormFieldWidget(
-//               htController: wtController,
-//               onChange: (value) => notifier.updateWeight(value),
-//               title: 'Peso',
-//             ),
-//             TextFormFieldWidget(
-//               htController: htController,
-//               onChange: (value) => notifier.updateHeight(value),
-//               title: 'Altura',
-//             ),
-//             Padding(
-//               padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-//               child: SizedBox(
-//                 height: 50.0,
-//                 child: button,
-//               ),
-//             ),
-//             Column(
-//               children: [
-//                 Text(
-//                   imc,
-//                   textAlign: TextAlign.center,
-//                   style: const TextStyle(color: Colors.purple, fontSize: 25.0),
-//                 ),
-//                 const AlturaImcConsumrExemplo(),
-//                 Text(
-//                   'Altura: $altura',
-//                   textAlign: TextAlign.center,
-//                   style: const TextStyle(color: Colors.purple, fontSize: 25.0),
-//                 ),
-//               ],
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 class ImcPage extends ConsumerStatefulWidget {
   const ImcPage({super.key});
 
@@ -184,7 +97,7 @@ class _ImcPageState extends ConsumerState<ImcPage> {
                 ),
                 const AlturaImcConsumrExemplo(),
                 Text(
-                  'Altura: $altura',
+                  'Altura: ${altura ?? ''}',
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.purple, fontSize: 25.0),
                 ),
@@ -194,5 +107,12 @@ class _ImcPageState extends ConsumerState<ImcPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    wtController.dispose();
+    htController.dispose();
+    super.dispose();
   }
 }
